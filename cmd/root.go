@@ -26,19 +26,26 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tlyng/c3p0/bot"
 )
 
-var cfgFile string
+var cfgFile, apiToken, channel string
 
+// RootCmd cobra command
 var RootCmd = &cobra.Command{
 	Use:   "c3p0",
 	Short: "c3p0 fuqye slackbot",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Hello World\n")
+		b := bot.NewBot(apiToken)
+		fmt.Printf("Initializing bot for %s\n", channel)
+		if err := b.Say("Hello World from golang"); err != nil {
+			fmt.Printf("Could not send message\n")
+		}
 	},
 }
 
+// Execute application
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -49,6 +56,8 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.c3p0.yaml)")
+	RootCmd.PersistentFlags().StringVar(&apiToken, "token", "", "slack api token")
+	RootCmd.PersistentFlags().StringVar(&channel, "channel", "", "slack channel")
 }
 
 func initConfig() {
